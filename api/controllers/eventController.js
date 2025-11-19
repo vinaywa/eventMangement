@@ -42,10 +42,8 @@ exports.createEvent = async (req, res) => {
 
 exports.getEvents = async (req, res) => {
   const events = await Event.find();
-  return res.json({
-    success: true,
-    data: events,
-  });
+
+  return { events }; 
 };
 
 
@@ -53,17 +51,12 @@ exports.getEventById = async (req, res) => {
   const event = await Event.findById(req.params.id);
 
   if (event) {
-    return res.json({
-      success: true,
-      data: event,
-    });
+    return { event };  // return data, DO NOT send response
   }
 
-  return res.json({
-    success: false,
-    message: "Event not found",
-  });
+  return { event: null };
 };
+
 
 
 exports.updateEvent = async (req, res) => {

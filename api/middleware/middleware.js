@@ -1,25 +1,25 @@
 const jwt = require("jsonwebtoken");
 
-function isLogin(req,res,next){
+function isLogin(req, res, next) {
     let token = req.headers.authorization;
-    if(!token){
+
+    if (!token) {
         return res.json({
-            success:false,
-            message:"please login"
-        })
+            success: false,
+            message: "please login"
+        });
     }
-    let decode = jwt.verify(token,"okkk")
-    // console.log(decode);
-    if(decode){
+
+    try {
+        let decode = jwt.verify(token, "okkk");
         req.userId = decode.userId;
-        return next();
-    }
-    else{
+        next();
+    } catch (err) {
         return res.json({
-            success:false,
-            message:"invalid token"
-        })
+            success: false,
+            message: "invalid token"
+        });
     }
-    
 }
+
 module.exports.isLogin = isLogin;

@@ -1,6 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
-
+const messageRoutes = require("./routes/messageRoutes");
 const userRoutes = require("./routes/userRoutes");
 const eventRoutes = require("./routes/eventRoutes");
 const participantRoutes = require("./routes/participantRoutes");
@@ -19,10 +19,12 @@ app.use("/login",loginRoute);
 app.use("/users", userRoutes);
 app.use("/events", eventRoutes);
 app.use("/participants", participantRoutes);
-
+app.use("/api/messages", messageRoutes);
 
 
 app.listen(5000,()=>{
   console.log("server running on port 5000");
 })
   
+
+

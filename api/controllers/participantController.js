@@ -38,12 +38,9 @@ exports.createParticipant = async (req, res) => {
 };
 
 
-exports.getParticipants = async (req, res) => {
+exports.getParticipants = async () => {
   const participants = await Participant.find();
-  return res.json({
-    success: true,
-    data: participants,
-  });
+  return { success: true, data: participants };
 };
 
 
@@ -51,10 +48,10 @@ exports.getParticipantById = async (req, res) => {
   const participant = await Participant.findById(req.params.id);
 
   if (participant) {
-    return res.json({
-      success: true,
-      data: participant,
-    });
+   
+     return { success: true,
+      data: participant}
+  
   }
 
   return res.json({
@@ -98,4 +95,4 @@ exports.deleteParticipant = async (req, res) => {
     success: false,
     message: "Participant not found",
   });
-};
+};  
