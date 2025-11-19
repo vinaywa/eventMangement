@@ -1,9 +1,12 @@
 const WebSocket = require("ws");
 const redis = require("redis");
 
-// Redis Subscriber (listens to messages from API)
+// Redis Clients
 const sub = redis.createClient({ url: "redis://127.0.0.1:6379" });
+const cache = redis.createClient({ url: "redis://127.0.0.1:6379" });
+
 sub.connect();
+cache.connect();
 
 // WebSocket Server
 const wss = new WebSocket.Server({ port: 8081 });
@@ -14,19 +17,40 @@ let clients = {};
 wss.on("connection", (ws) => {
     console.log("Client connected");
 
-    ws.on("message", (msg) => {
+    ws.on("message", async (msg) => {
         try {
             let data = JSON.parse(msg);
 
-            // The client must send: { eventId, userId }
+            //join room
             if (data.type === "join") {
-                if (!clients[data.eventId]) {
-                    clients[data.eventId] = [];
+
+                let eventId = data.eventId;
+
+                // Check if room exists in Redis
+                let roomActive = await cache.get(`room:${eventId}`);
+
+                if (!roomActive) {
+                    return ws.send(JSON.stringify({
+                        success: false,
+                        message: "Room not created yet"
+                    }));
                 }
-                ws.eventId = data.eventId;
+
+                if (!clients[eventId]) {
+                    clients[eventId] = [];
+                }
+
+                ws.eventId = eventId;
                 ws.userId = data.userId;
-                clients[data.eventId].push(ws);
-                console.log("User joined room:", data.eventId);
+
+                clients[eventId].push(ws);
+
+                console.log("User joined room:", eventId);
+
+                ws.send(JSON.stringify({
+                    success: true,
+                    message: `Joined room ${eventId}`
+                }));
             }
 
         } catch (err) {
@@ -41,16 +65,15 @@ wss.on("connection", (ws) => {
     });
 });
 
-// Listen to Redis messages from API
+//redis broadcast
 sub.subscribe("event_messages", (msg) => {
-
     let data = JSON.parse(msg);
     let eventId = data.eventId;
 
     if (clients[eventId]) {
-        for (let client of clients[eventId]) {
+        clients[eventId].forEach(client => {
             client.send(JSON.stringify(data));
-        }
+        });
     }
 });
 

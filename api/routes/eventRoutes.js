@@ -100,4 +100,18 @@ router.delete("/:id", isLogin, async (req, res) => {
     return result;
 });
 
+
+// POST /events/:eventId/create-room
+router.post("/:eventId/create-room",isLogin, async (req, res) => {
+    const eventId = req.params.eventId;
+
+    await setCache(`room:${eventId}`, "active");
+
+    return res.json({
+        success: true,
+        message: `Room created for event ${eventId}`
+    });
+});
+
+
 module.exports = router;
