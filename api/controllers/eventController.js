@@ -14,7 +14,6 @@ exports.createEvent = async (req, res) => {
       message: "User not found",
     });
   }
-
   if (validUser.role === "participant") {
     return res.json({
       success: false,

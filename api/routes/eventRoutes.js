@@ -14,8 +14,6 @@ const { getCache, setCache, deleteCache } = require("../utils/cache");
 // CREATE EVENT
 router.post("/", isLogin, async (req, res) => {
     const result = await createEvent(req, res);
-
-    // After creating a new event, clear list cache
     await deleteCache("events:list");
 
     return result;

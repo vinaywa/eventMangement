@@ -49,8 +49,10 @@ exports.getParticipantById = async (req, res) => {
 
   if (participant) {
    
-     return { success: true,
-      data: participant}
+     return {
+      Success: true,
+      data: participant
+    }
   
   }
 
